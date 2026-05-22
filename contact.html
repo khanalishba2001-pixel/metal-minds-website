@@ -4,160 +4,807 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Contact and Quote - Metal Minds</title>
-
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
+<link rel="stylesheet" href="./chatbot.css">
 <style>
-body{font-family:Inter,sans-serif;margin:0;background:#fff;color:#1c1e20}
-.wrap{max-width:1100px;margin:auto;padding:20px}
-.form-input,.form-select,.form-textarea{width:100%;padding:10px;margin-top:5px;border:1px solid #ccc}
-.btn{padding:12px 20px;background:#2e3338;color:#fff;border:none;cursor:pointer}
-.success-box{display:none;background:#f6f7f8;padding:20px;margin-top:20px}
-.success-box.show{display:block}
-#map{height:250px;margin-top:20px}
+:root{--ink:#1c1e20;--steel:#2e3338;--silver:#8a9099;--light:#b8bec5;--white:#fff;--off:#f6f7f8;--border:#dde0e4;--accent:#5a6270;--shine:linear-gradient(135deg,#c4c8cc 0%,#e8eaec 40%,#9aa0a8 70%,#c4c8cc 100%);--fh:'Bebas Neue','Barlow Condensed',sans-serif;--fb:'Inter',system-ui,sans-serif;--fm:'IBM Plex Mono',monospace;--max:1200px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--white);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}img{display:block;width:100%;object-fit:cover}ul{list-style:none}button{font-family:inherit;cursor:pointer;border:none;background:none}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 2.5rem}
+.site-header{position:sticky;top:0;z-index:200;background:var(--ink);border-bottom:1px solid rgba(255,255,255,.08)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;height:70px}
+.nav-logo{display:flex;align-items:center;gap:.75rem}
+.nav-logo img{width:44px;height:44px;object-fit:contain}
+.nav-logo-name{font-family:var(--fh);font-size:1.45rem;letter-spacing:.08em;color:var(--white)}
+.nav-logo-sub{font-family:var(--fm);font-size:.52rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.32);margin-top:1px}
+.nav-links{display:flex;align-items:center;gap:2.2rem}
+.nav-links a{font-family:var(--fm);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.55);transition:color .2s;position:relative;padding-bottom:3px}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--light);transition:width .3s}
+.nav-links a:hover,.nav-links a.active{color:var(--white)}.nav-links a:hover::after,.nav-links a.active::after{width:100%}
+.nav-cta{background:rgba(255,255,255,.1)!important;color:var(--white)!important;padding:.45rem 1.1rem;border:1px solid rgba(255,255,255,.2)!important;transition:background .2s!important}.nav-cta::after{display:none!important}.nav-cta:hover{background:rgba(255,255,255,.18)!important}
+.ham{display:none;flex-direction:column;gap:5px;padding:4px}.ham span{display:block;width:22px;height:1.5px;background:rgba(255,255,255,.75);transition:.25s}
+.ham.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}.ham.open span:nth-child(2){opacity:0}.ham.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+.mob-nav{display:none;flex-direction:column;background:var(--ink);border-top:1px solid rgba(255,255,255,.07)}.mob-nav.open{display:flex}
+.mob-nav a{font-family:var(--fm);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6);padding:1rem 2.5rem;border-bottom:1px solid rgba(255,255,255,.06);transition:color .2s}.mob-nav a:hover,.mob-nav a.active{color:var(--white)}
+.btn{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--fm);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;font-weight:500;padding:.82rem 1.9rem;transition:all .22s;cursor:pointer;border:none}
+.btn-primary{background:var(--steel);color:var(--white)}.btn-primary:hover{background:var(--accent)}
+.btn-outline{background:transparent;color:var(--white);border:1px solid rgba(255,255,255,.35)}.btn-outline:hover{border-color:var(--white);background:rgba(255,255,255,.06)}
+.btn-light{background:var(--white);color:var(--ink)}.btn-light:hover{background:var(--off)}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--border)}.btn-ghost:hover{border-color:var(--ink)}
+.hero{background:var(--ink);color:var(--white);padding:6rem 0 5rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(-55deg,transparent,transparent 40px,rgba(255,255,255,.016) 40px,rgba(255,255,255,.016) 41px)}
+.hero-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center}
+.hero-eye{font-family:var(--fm);font-size:.65rem;letter-spacing:.3em;text-transform:uppercase;color:var(--silver);margin-bottom:1.2rem;display:flex;align-items:center;gap:.7rem}.hero-eye::before{content:'';width:28px;height:1px;background:var(--silver);display:block}
+.hero-title{font-family:var(--fh);font-size:clamp(4rem,8vw,7.5rem);line-height:.88;letter-spacing:.02em;text-transform:uppercase;margin-bottom:1.6rem}
+.grad{background:var(--shine);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{font-size:1rem;color:rgba(255,255,255,.52);max-width:420px;line-height:1.75;margin-bottom:2.2rem}
+.hero-btns{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:3rem}
+.hero-divider{width:40px;height:1px;background:rgba(255,255,255,.15);margin-bottom:2rem}
+.hero-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
+.hs{border-left:1px solid rgba(255,255,255,.12);padding-left:1.2rem}
+.hs-n{font-family:var(--fh);font-size:2.2rem;line-height:1;margin-bottom:.2rem;background:var(--shine);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hs-l{font-family:var(--fm);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.hero-visual{display:flex;flex-direction:column;gap:2px}
+.flashcard-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+.flashcard{position:relative;overflow:hidden;cursor:pointer;aspect-ratio:3/4;display:block;background:var(--ink)}
+.flashcard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .65s ease;filter:grayscale(18%) brightness(.88)}
+.flashcard:hover img{transform:scale(1.07);filter:grayscale(0%) brightness(.72)}
+.flashcard::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(12,12,12,.92) 0%,rgba(12,12,12,.45) 38%,transparent 65%);transition:background .4s}
+.flashcard:hover::after{background:linear-gradient(to top,rgba(12,12,12,.97) 0%,rgba(12,12,12,.72) 50%,rgba(12,12,12,.2) 100%)}
+.flashcard-body{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;padding:1.6rem 1.8rem}
+.fc-num{font-family:var(--fm);font-size:.58rem;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:.35rem}
+.fc-name{font-family:var(--fh);font-size:clamp(1.5rem,2.5vw,2rem);letter-spacing:.04em;text-transform:uppercase;color:var(--white);line-height:1;margin-bottom:0;transition:margin-bottom .35s ease}
+.fc-desc{font-size:.82rem;color:rgba(255,255,255,.65);line-height:1.55;max-height:0;overflow:hidden;opacity:0;transition:max-height .4s ease,opacity .3s ease .05s,margin .3s ease}
+.fc-arrow{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--fm);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--white);max-height:0;overflow:hidden;opacity:0;transition:max-height .35s ease .05s,opacity .3s ease .1s,margin .3s ease;border-bottom:1px solid rgba(255,255,255,.4);padding-bottom:2px;width:fit-content}
+.flashcard:hover .fc-name{margin-bottom:.6rem}.flashcard:hover .fc-desc{max-height:80px;opacity:1;margin-top:.4rem}.flashcard:hover .fc-arrow{max-height:40px;opacity:1;margin-top:.9rem}
+.flashcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--light);transform:scaleY(0);transform-origin:bottom;transition:transform .4s ease;z-index:3}.flashcard:hover::before{transform:scaleY(1)}
+.ticker{background:var(--steel);color:rgba(255,255,255,.6);padding:.65rem 0;overflow:hidden}
+.ticker-track{display:flex;animation:tick 32s linear infinite;white-space:nowrap}
+.ticker-track span{font-family:var(--fm);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;padding:0 2.2rem}.ticker-track span::after{content:'·';margin-left:2.2rem;opacity:.4}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.sec{padding:5.5rem 0}.sec-dark{background:var(--ink);color:var(--white)}.sec-off{background:var(--off)}
+.sec-label{font-family:var(--fm);font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--silver);margin-bottom:.7rem;display:flex;align-items:center;gap:.6rem}.sec-label::before{content:'';width:16px;height:1px;background:var(--silver);display:block}
+.sec-dark .sec-label{color:rgba(255,255,255,.38)}.sec-dark .sec-label::before{background:rgba(255,255,255,.25)}
+.sec-heading{font-family:var(--fh);font-size:clamp(2rem,4.5vw,3.5rem);font-weight:400;line-height:.95;text-transform:uppercase;letter-spacing:.03em;margin-bottom:1rem}
+.sec-body{font-size:.95rem;color:var(--accent);max-width:500px;line-height:1.75}.sec-dark .sec-body{color:rgba(255,255,255,.45)}
+.sh-row{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;margin-bottom:3rem;flex-wrap:wrap}
+.why-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;background:var(--border)}
+.why-item{background:var(--white);padding:2.5rem 2rem;transition:background .28s}.why-item:hover{background:var(--ink);color:var(--white)}
+.why-n{font-family:var(--fh);font-size:3rem;color:var(--border);line-height:1;margin-bottom:.4rem;transition:color .28s}.why-item:hover .why-n{color:rgba(255,255,255,.07)}
+.why-title{font-family:var(--fh);font-size:1.2rem;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.4rem}
+.why-text{font-size:.855rem;color:var(--accent);line-height:1.65;transition:color .28s}.why-item:hover .why-text{color:rgba(255,255,255,.48)}
+.proc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(255,255,255,.06)}
+.proc-item{padding:2.5rem 2rem;border-top:2px solid var(--silver)}
+.proc-n{font-family:var(--fh);font-size:3.5rem;color:rgba(255,255,255,.07);line-height:1;margin-bottom:.4rem}
+.proc-title{font-family:var(--fh);font-size:1.25rem;text-transform:uppercase;color:var(--white);margin-bottom:.5rem}
+.proc-text{font-size:.855rem;color:rgba(255,255,255,.45);line-height:1.65}
+.cta-band{background:var(--steel);color:var(--white);padding:3.5rem 0}
+.cta-inner{display:flex;justify-content:space-between;align-items:center;gap:2rem;flex-wrap:wrap}
+.cta-title{font-family:var(--fh);font-size:clamp(1.8rem,3.5vw,2.8rem);text-transform:uppercase;letter-spacing:.03em;line-height:1}
+.cta-sub{font-size:.9rem;color:rgba(255,255,255,.52);margin-top:.35rem}
+.ph{background:var(--ink);color:var(--white);padding:5rem 0 3.5rem}
+.ph-label{font-family:var(--fm);font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:.9rem}
+.ph-title{font-family:var(--fh);font-size:clamp(3rem,7vw,6rem);text-transform:uppercase;line-height:.9;letter-spacing:.02em;margin-bottom:.8rem}
+.ph-title em{background:var(--shine);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-style:normal}
+.ph-sub{font-size:.95rem;color:rgba(255,255,255,.45);max-width:440px;line-height:1.7}
+.filter-bar{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.fb{font-family:var(--fm);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;padding:.45rem 1rem;border:1px solid var(--border);background:var(--white);color:var(--silver);cursor:pointer;transition:all .2s}
+.fb:hover{border-color:var(--steel);color:var(--ink)}.fb.active{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.full-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.pcard{background:var(--off);overflow:hidden;border:1px solid var(--border)}
+.pcard img{aspect-ratio:4/3;object-fit:cover;width:100%}
+.pcard-body{padding:1.2rem 1.3rem 1.4rem}
+.pcard-name{font-family:var(--fh);font-size:1.1rem;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem}
+.pcard-desc{font-size:.8rem;color:var(--accent);line-height:1.55;margin-bottom:.8rem}
+.pcard-foot{display:flex;justify-content:space-between;align-items:center}
+.pcard-tag{font-family:var(--fm);font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--white);background:var(--steel);display:inline-block;padding:.2rem .55rem}
+.pcard-q{font-family:var(--fm);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--border);padding:.28rem .7rem;color:var(--accent);transition:all .2s}
+.pcard-q:hover{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.about-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:5rem;align-items:start}
+.about-imgs{display:flex;flex-direction:column;gap:2px}
+.about-imgs img:first-child{aspect-ratio:4/3}.about-imgs img:last-child{aspect-ratio:16/7}
+.val-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);margin-top:2.5rem}
+.val-item{background:var(--white);padding:1.5rem 1.3rem;border-top:2px solid var(--silver)}
+.val-title{font-family:var(--fh);font-size:1rem;text-transform:uppercase;letter-spacing:.04em;margin-bottom:.3rem}
+.val-text{font-size:.78rem;color:var(--accent);line-height:1.6}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:rgba(255,255,255,.06);margin:3rem 0}
+.sbox{padding:2rem 1.5rem;border-top:2px solid var(--silver)}
+.sb-n{font-family:var(--fh);font-size:2.8rem;line-height:1;margin-bottom:.2rem;background:var(--shine);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sb-l{font-family:var(--fm);font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);margin-top:2.5rem}
+.tm{background:var(--white);padding:2rem 1.5rem;border-top:2px solid var(--silver)}
+.tm-role{font-family:var(--fm);font-size:.57rem;letter-spacing:.2em;text-transform:uppercase;color:var(--silver);margin-bottom:.25rem}
+.tm-name{font-family:var(--fh);font-size:1.3rem;text-transform:uppercase;letter-spacing:.03em;margin-bottom:.5rem}
+.tm-bio{font-size:.8rem;color:var(--accent);line-height:1.6}
+.tm-link{display:inline-flex;align-items:center;gap:.35rem;font-family:var(--fm);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--steel);border-bottom:1px solid var(--border);padding-bottom:2px;margin-top:.8rem;transition:border-color .2s,color .2s}
+.tm-link:hover{color:var(--ink);border-color:var(--ink)}
+.contact-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:5rem}
+.form-group{margin-bottom:1rem}
+.form-label{display:block;font-family:var(--fm);font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:var(--silver);margin-bottom:.35rem}
+.form-input,.form-select,.form-textarea{width:100%;padding:.82rem 1rem;border:1px solid var(--border);background:var(--white);font-family:var(--fb);font-size:.93rem;color:var(--ink);outline:none;transition:border-color .2s;-webkit-appearance:none;border-radius:0}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--steel)}
+.form-textarea{resize:vertical;min-height:110px}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.ci{margin-bottom:1.8rem}.ci-lbl{font-family:var(--fm);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--silver);margin-bottom:.3rem}
+.ci-val{font-size:.93rem;color:var(--ink);line-height:1.65}.ci-val a{border-bottom:1px solid var(--border);transition:border-color .2s}.ci-val a:hover{border-color:var(--ink)}
+#map{width:100%;height:280px;border:1px solid var(--border);margin-top:1.5rem}
+.success-box{display:none;padding:3rem 2rem;background:var(--off);border-top:2px solid var(--silver);text-align:center}
+.success-box.show{display:block}.success-box h3{font-family:var(--fh);font-size:2rem;text-transform:uppercase;margin-bottom:.5rem}.success-box p{font-size:.9rem;color:var(--accent);margin-bottom:1.5rem}
+.footer{background:#0e1012;color:var(--white);padding:4rem 0 0}
+.footer-logo-img{width:48px;height:48px;object-fit:contain;margin-bottom:.5rem}
+.footer-grid{display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr;gap:3rem;padding-bottom:3rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.footer-name{font-family:var(--fh);font-size:1.3rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.3rem}
+.footer-name span{background:var(--shine);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.footer-tag{font-size:.8rem;color:rgba(255,255,255,.35);line-height:1.65;margin-bottom:1rem}
+.footer-col-h{font-family:var(--fm);font-size:.56rem;letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:.9rem}
+.footer-links{display:flex;flex-direction:column;gap:.4rem}.footer-links a{font-size:.82rem;color:rgba(255,255,255,.48);transition:color .2s}.footer-links a:hover{color:var(--white)}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;padding:1.3rem 0;flex-wrap:wrap;gap:1rem}
+.footer-copy{font-family:var(--fm);font-size:.58rem;letter-spacing:.12em;color:rgba(255,255,255,.2)}
+.fu{opacity:0;transform:translateY(24px);transition:opacity .65s ease,transform .65s ease}.fu.in{opacity:1;transform:none}
+.fu.d1{transition-delay:.08s}.fu.d2{transition-delay:.16s}.fu.d3{transition-delay:.24s}.fu.d4{transition-delay:.34s}
+@media(max-width:960px){.hero-inner{grid-template-columns:1fr}.hero-visual{display:block}.flashcard-row{grid-template-columns:repeat(2,1fr)}.full-grid{grid-template-columns:repeat(2,1fr)}.why-grid{grid-template-columns:1fr}.proc-grid{grid-template-columns:1fr;gap:2px}.about-grid{grid-template-columns:1fr;gap:3rem}.contact-grid{grid-template-columns:1fr;gap:3rem}.footer-grid{grid-template-columns:1fr 1fr;gap:2rem}.stat-row{grid-template-columns:repeat(2,1fr)}.val-grid{grid-template-columns:repeat(2,1fr)}.team-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.nav-links{display:none}.ham{display:flex}.flashcard-row{grid-template-columns:1fr}.full-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr}.stat-row{grid-template-columns:1fr 1fr}.val-grid{grid-template-columns:1fr}.team-grid{grid-template-columns:1fr}.cta-inner{flex-direction:column;text-align:center}.sh-row{flex-direction:column;align-items:flex-start}.hero{padding:4rem 0 3rem}.hero-stats{grid-template-columns:1fr 1fr;gap:1rem}}
+/* =========================
+
+   ZIMBABWE COVERAGE MAP
+========================= */
+.hero-video-box {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #000;
+}
+
+.hero-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* dark layer on video */
+.hero-video-box::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 1;
+}
+
+/* text on top of video */
+.hero-video-overlay{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  color:#fff;
+  width:80%;
+  z-index:2;
+  padding:20px;
+  border-radius:12px;
+}
+
+.hero-video-overlay h2{
+  font-size:2rem;
+  margin-bottom:12px;
+  font-family:'Georgia', serif;
+  font-weight:700;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.hero-video-overlay p{
+  font-size:1rem;
+  line-height:1.7;
+  font-family:'Arial', sans-serif;
+  margin:0;
+}
+.coverage-sec{
+  background:var(--off);
+  padding:5.5rem 0;
+}
+
+.coverage-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:2rem;
+  flex-wrap:wrap;
+  margin-bottom:3rem;
+}
+
+.coverage-copy{
+  max-width:620px;
+}
+
+.coverage-label{
+  font-family:var(--fm);
+  font-size:.62rem;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--silver);
+  margin-bottom:.7rem;
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+}
+
+.coverage-label::before{
+  content:'';
+  width:16px;
+  height:1px;
+  background:var(--silver);
+  display:block;
+}
+
+.coverage-title{
+  font-family:var(--fh);
+  font-size:clamp(2.2rem,4.8vw,4rem);
+  line-height:.95;
+  text-transform:uppercase;
+  letter-spacing:.03em;
+  margin-bottom:1rem;
+}
+
+.coverage-text{
+  font-size:.95rem;
+  color:var(--accent);
+  line-height:1.8;
+  max-width:580px;
+}
+
+.coverage-layout{
+  display:grid;
+  grid-template-columns:1fr 1.05fr;
+  gap:2.5rem;
+  align-items:stretch;
+}
+
+.coverage-left{
+  display:flex;
+  flex-direction:column;
+  gap:1.5rem;
+}
+
+.city-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:.65rem;
+}
+
+.city-chip{
+  text-align:left;
+  padding:1rem 1rem;
+  border:1px solid var(--border);
+  background:var(--white);
+  transition:all .22s ease;
+  cursor:pointer;
+}
+
+.city-chip:hover,
+.city-chip.active{
+  background:var(--ink);
+  border-color:var(--ink);
+  color:var(--white);
+}
+
+.city-chip-name{
+  display:block;
+  font-family:var(--fh);
+  font-size:1.1rem;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  line-height:1;
+  margin-bottom:.28rem;
+}
+
+.city-chip-role{
+  display:block;
+  font-family:var(--fm);
+  font-size:.56rem;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--silver);
+  transition:color .22s ease;
+}
+
+.city-chip:hover .city-chip-role,
+.city-chip.active .city-chip-role{
+  color:rgba(255,255,255,.55);
+}
+
+.city-detail{
+  background:var(--white);
+  border:1px solid var(--border);
+  border-top:3px solid var(--steel);
+  padding:1.8rem;
+  min-height:235px;
+}
+
+.city-detail-kicker{
+  font-family:var(--fm);
+  font-size:.58rem;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:var(--silver);
+  margin-bottom:.6rem;
+}
+
+.city-detail-title{
+  font-family:var(--fh);
+  font-size:2rem;
+  line-height:1;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  margin-bottom:.65rem;
+}
+
+.city-detail-role{
+  display:inline-block;
+  font-family:var(--fm);
+  font-size:.58rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  padding:.25rem .65rem;
+  background:var(--steel);
+  color:var(--white);
+  margin-bottom:1rem;
+}
+
+.city-detail-text{
+  font-size:.9rem;
+  color:var(--accent);
+  line-height:1.75;
+  margin-bottom:1.35rem;
+}
+
+.city-detail-actions{
+  display:flex;
+  gap:.7rem;
+  flex-wrap:wrap;
+}
+
+.coverage-map-wrap{
+  background:var(--ink);
+  border:1px solid rgba(255,255,255,.08);
+  position:relative;
+  min-height:620px;
+  overflow:hidden;
+}
+
+.coverage-map-wrap::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 65% 38%, rgba(255,255,255,.08), transparent 28%),
+    repeating-linear-gradient(-55deg, transparent, transparent 38px, rgba(255,255,255,.018) 38px, rgba(255,255,255,.018) 39px);
+}
+
+.map-topline{
+  position:absolute;
+  left:2rem;
+  top:1.6rem;
+  z-index:2;
+}
+
+.map-topline-small{
+  display:block;
+  font-family:var(--fm);
+  font-size:.58rem;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.42);
+  margin-bottom:.45rem;
+}
+
+.map-topline-title{
+  font-family:var(--fh);
+  font-size:2rem;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  color:var(--white);
+  line-height:1;
+}
+
+.zim-map{
+  position:absolute;
+  inset:0;
+  z-index:1;
+}
+
+.zim-outline{
+  position:absolute;
+  width:74%;
+  height:68%;
+  left:13%;
+  top:18%;
+  border:1px solid rgba(255,255,255,.18);
+  clip-path:polygon(
+    14% 34%,
+    25% 24%,
+    41% 23%,
+    48% 17%,
+    62% 18%,
+    73% 27%,
+    87% 31%,
+    82% 44%,
+    90% 58%,
+    77% 67%,
+    66% 81%,
+    50% 79%,
+    36% 88%,
+    25% 79%,
+    14% 77%,
+    8% 62%,
+    14% 49%
+  );
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.03)),
+    repeating-linear-gradient(
+      135deg,
+      rgba(255,255,255,.05) 0,
+      rgba(255,255,255,.05) 1px,
+      transparent 1px,
+      transparent 14px
+    );
+  box-shadow:
+    inset 0 0 50px rgba(255,255,255,.05),
+    0 0 90px rgba(255,255,255,.06);
+}
+
+.map-pin{
+  position:absolute;
+  z-index:3;
+  transform:translate(-50%,-50%);
+  background:none;
+  border:none;
+  cursor:pointer;
+  color:var(--white);
+}
+
+.pin-dot{
+  display:block;
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  background:var(--white);
+  border:4px solid var(--steel);
+  box-shadow:0 0 0 5px rgba(255,255,255,.13),0 0 24px rgba(255,255,255,.45);
+  transition:transform .2s ease,box-shadow .2s ease,background .2s ease;
+  margin:auto;
+}
+
+.pin-label{
+  display:block;
+  white-space:nowrap;
+  margin-top:.55rem;
+  font-family:var(--fm);
+  font-size:.56rem;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.8);
+  background:rgba(14,16,18,.82);
+  border:1px solid rgba(255,255,255,.12);
+  padding:.22rem .45rem;
+}
+
+.map-pin:hover .pin-dot,
+.map-pin.active .pin-dot{
+  transform:scale(1.22);
+  background:#dfe3e8;
+  box-shadow:0 0 0 7px rgba(255,255,255,.16),0 0 34px rgba(255,255,255,.62);
+}
+
+.map-pin.active .pin-label{
+  color:var(--white);
+  border-color:rgba(255,255,255,.32);
+}
+
+.pin-harare{left:68%;top:43%}
+.pin-chitungwiza{left:69%;top:48%}
+.pin-bulawayo{left:28%;top:67%}
+.pin-gweru{left:45%;top:55%}
+.pin-kwekwe{left:49%;top:47%}
+.pin-kadoma{left:57%;top:45%}
+.pin-mutare{left:82%;top:52%}
+.pin-masvingo{left:57%;top:72%}
+
+.coverage-foot{
+  position:absolute;
+  left:2rem;
+  right:2rem;
+  bottom:1.8rem;
+  z-index:2;
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  align-items:center;
+  flex-wrap:wrap;
+  padding-top:1.2rem;
+  border-top:1px solid rgba(255,255,255,.12);
+}
+
+.coverage-foot p{
+  font-size:.82rem;
+  color:rgba(255,255,255,.5);
+  line-height:1.6;
+  max-width:410px;
+}
+
+@media(max-width:960px){
+  .coverage-layout{
+    grid-template-columns:1fr;
+  }
+
+  .coverage-map-wrap{
+    min-height:560px;
+  }
+}
+
+@media(max-width:640px){
+  .coverage-sec{
+    padding:4rem 0;
+  }
+
+  .city-grid{
+    grid-template-columns:1fr;
+  }
+
+  .city-detail{
+    min-height:auto;
+  }
+
+  .coverage-map-wrap{
+    min-height:520px;
+  }
+
+  .map-topline{
+    left:1.2rem;
+    top:1.2rem;
+  }
+
+  .coverage-foot{
+    left:1.2rem;
+    right:1.2rem;
+    bottom:1.2rem;
+  }
+
+  .pin-label{
+    font-size:.48rem;
+    padding:.18rem .35rem;
+  }
+
+  .pin-harare{left:68%;top:42%}
+  .pin-chitungwiza{left:70%;top:48%}
+  .pin-bulawayo{left:27%;top:67%}
+  .pin-gweru{left:45%;top:56%}
+  .pin-kwekwe{left:49%;top:48%}
+  .pin-kadoma{left:57%;top:45%}
+  .pin-mutare{left:82%;top:53%}
+  .pin-masvingo{left:57%;top:72%}
+}
 </style>
 
+<style>
+/* Contact page only */
+.contact-page-section{background:var(--white);padding:5.5rem 0;}
+.contact-card{background:var(--white);border:1px solid var(--border);padding:2.5rem;box-shadow:0 20px 60px rgba(0,0,0,.06);}
+.contact-card .sec-heading{margin-bottom:.75rem;}
+.contact-intro{font-size:.95rem;color:var(--accent);line-height:1.75;margin-bottom:2rem;max-width:620px;}
+.info-panel{background:var(--off);border:1px solid var(--border);padding:2.5rem;}
+.info-panel .sec-heading{font-size:3rem;margin-bottom:1.5rem;}
+.info-item{border-bottom:1px solid var(--border);padding:1.15rem 0;}
+.info-item:first-of-type{padding-top:0;}
+.info-item:last-of-type{border-bottom:none;}
+.info-label{font-family:var(--fm);font-size:.58rem;letter-spacing:.2em;text-transform:uppercase;color:var(--silver);margin-bottom:.35rem;}
+.info-value{font-size:.93rem;color:var(--ink);line-height:1.7;}
+.error-box{display:none;background:#fff1f1;color:#8a1f1f;padding:15px;margin-top:18px;border-left:4px solid #b42318;font-size:.9rem;}
+.error-box.show{display:block;}
+.success-box h2{font-family:var(--fh);font-size:2.2rem;text-transform:uppercase;margin-bottom:.5rem;}
+@media(max-width:960px){.contact-card,.info-panel{padding:1.5rem;}}
+</style>
 </head>
-
 <body>
+<header class="site-header"><div class="wrap header-inner"><a href="index.html" class="nav-logo"><img src="data:image/png;base64,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" alt="Metal Minds"/><div><div class="nav-logo-name">Metal Minds</div><div class="nav-logo-sub">Construction &amp; Steel &middot; Harare</div></div></a><nav class="nav-links"><a href="index.html">Home</a><a href="products.html">Products</a><a href="about.html">About</a><a href="contact.html" class="active">Contact</a><a href="contact.html" class="nav-cta">Get Quote</a></nav><button class="ham" id="ham" type="button" aria-label="Menu"><span></span><span></span><span></span></button></div></header><nav class="mob-nav" id="mobNav"><a href="index.html">Home</a><a href="products.html">Products</a><a href="about.html">About</a><a href="contact.html" class="active">Contact</a><a href="contact.html">Get Quote</a></nav>
 
-<div class="wrap">
+<section class="ph">
+  <div class="wrap">
+    <div class="ph-label">Contact Metal Minds</div>
+    <h1 class="ph-title">Request a <em>Quote</em></h1>
+    <p class="ph-sub">Send us your steel and construction material requirements. Our team will respond with product availability, pricing, and delivery support for your project.</p>
+  </div>
+</section>
 
-<h1>Get a Quote</h1>
+<section class="contact-page-section">
+  <div class="wrap contact-grid">
 
-<div id="formWrap">
+    <div class="contact-card">
+      <div class="sec-label">Quote Request</div>
+      <h2 class="sec-heading">Get a Quote</h2>
+      <p class="contact-intro">Fill in the form below and tell us what you need. We will contact you as soon as possible.</p>
 
-<form id="quoteForm">
+      <div id="formWrap">
+        <form id="quoteForm">
+          <div class="form-group">
+            <label class="form-label" for="inp-name">Full Name</label>
+            <input class="form-input" id="inp-name" type="text" placeholder="Full Name" required>
+          </div>
 
-<input class="form-input" id="inp-name" type="text" placeholder="Full Name" required>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="inp-phone">Phone</label>
+              <input class="form-input" id="inp-phone" type="tel" placeholder="Phone" required>
+            </div>
 
-<input class="form-input" id="inp-phone" type="tel" placeholder="Phone" required>
+            <div class="form-group">
+              <label class="form-label" for="inp-email">Email</label>
+              <input class="form-input" id="inp-email" type="email" placeholder="Email">
+            </div>
+          </div>
 
-<input class="form-input" id="inp-email" type="email" placeholder="Email">
+          <div class="form-group">
+            <label class="form-label" for="inp-prod">Product</label>
+            <select class="form-select" id="inp-prod">
+              <option value="">Select Product</option>
+              <option value="IBR Roofing Sheets">IBR Roofing Sheets</option>
+              <option value="Barbed Wire">Barbed Wire</option>
+              <option value="Game Fence">Game Fence</option>
+              <option value="Brickforce Wire">Brickforce Wire</option>
+              <option value="Wire Nails">Wire Nails</option>
+              <option value="Door Frames">Door Frames</option>
+              <option value="Welding Rods">Welding Rods</option>
+              <option value="PVC Pipes">PVC Pipes</option>
+              <option value="Galvanised Wire">Galvanised Wire</option>
+            </select>
+          </div>
 
-<select class="form-select" id="inp-prod">
-<option value="">Select Product</option>
-<option value="IBR Roofing Sheets">IBR Roofing Sheets</option>
-<option value="Barbed Wire">Barbed Wire</option>
-<option value="Game Fence">Game Fence</option>
-<option value="Welding Rods">Welding Rods</option>
-</select>
+          <div class="form-group">
+            <label class="form-label" for="inp-msg">Message</label>
+            <textarea class="form-textarea" id="inp-msg" placeholder="Message" required></textarea>
+          </div>
 
-<textarea class="form-textarea" id="inp-msg" placeholder="Message" required></textarea>
+          <button class="btn btn-primary" id="submitBtn" type="submit">Send Quote</button>
+        </form>
+      </div>
 
-<br><br>
-<button class="btn" type="submit">Send Quote</button>
+      <div class="success-box" id="successBox">
+        <h2>Quote Sent</h2>
+        <p>Thank you. We will contact you soon.</p>
+      </div>
 
-</form>
+      <div class="error-box" id="errorBox"></div>
+    </div>
 
-</div>
+    <aside class="info-panel">
+      <div class="sec-label">Contact Details</div>
+      <h2 class="sec-heading">Talk to Us</h2>
 
-<div class="success-box" id="successBox">
-<h2>Quote Sent ✅</h2>
-<p>We will contact you soon.</p>
-</div>
+      <div class="info-item">
+        <div class="info-label">Phone</div>
+        <div class="info-value">+263 775 530 739</div>
+      </div>
 
-<div id="map"></div>
+      <div class="info-item">
+        <div class="info-label">Email</div>
+        <div class="info-value">meeranzia@gmail.com</div>
+      </div>
 
-</div>
+      <div class="info-item">
+        <div class="info-label">Location</div>
+        <div class="info-value">Harare, Zimbabwe</div>
+      </div>
 
+      <div class="info-item">
+        <div class="info-label">Products</div>
+        <div class="info-value">IBR sheets, barbed wire, game fence, brickforce, wire nails, door frames, welding rods, PVC pipes, and galvanized wire.</div>
+      </div>
+
+      <div id="map"></div>
+    </aside>
+
+  </div>
+</section>
+
+<footer class="footer"><div class="wrap"><div class="footer-grid"><div><img src="data:image/png;base64,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" class="footer-logo-img" alt=""/><div class="footer-name">Metal<span>Minds</span></div><p class="footer-tag">Zimbabwe's trusted steel supplier since 2010.</p><p style="font-size:.78rem;color:rgba(255,255,255,.32);line-height:1.7">orders@metalminds.co<br/>+263 000 000 000</p></div><div><div class="footer-col-h">Products</div><div class="footer-links"><a href="products.html">IBR Roofing Sheets</a><a href="products.html">Barbed Wire</a><a href="products.html">Game Fence</a><a href="products.html">All Products &rarr;</a></div></div><div><div class="footer-col-h">Company</div><div class="footer-links"><a href="index.html">Home</a><a href="about.html">About Us</a><a href="about.html">Our Team</a><a href="contact.html">Contact</a><a href="contact.html">Request Quote</a></div></div><div><div class="footer-col-h">Find Us</div><p style="font-size:.8rem;color:rgba(255,255,255,.38);line-height:1.8">123 Samora Machel Ave<br/>Harare, Zimbabwe<br/><br/>Mon&ndash;Fri 07:30&ndash;17:00<br/>Sat 08:00&ndash;13:00</p></div></div><div class="footer-bottom"><span class="footer-copy">&copy; 2025 Metal Minds (Pvt) Ltd. All rights reserved.</span><span class="footer-copy">Supplier No. MM-001</span></div></div></footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+  const ham = document.getElementById("ham");
+  const mobNav = document.getElementById("mobNav");
 
-/* =========================
-   EMAILJS INIT (ONLY ONCE)
-========================= */
-emailjs.init({
-  publicKey: "_szbyV9RphuXNo0Hj"
-});
+  if (ham && mobNav) {
+    ham.addEventListener("click", function () {
+      ham.classList.toggle("open");
+      mobNav.classList.toggle("open");
+    });
+  }
 
-/* =========================
-   FORM SUBMIT
-========================= */
-const form = document.getElementById("quoteForm");
+  const form = document.getElementById("quoteForm");
+  const formWrap = document.getElementById("formWrap");
+  const successBox = document.getElementById("successBox");
+  const errorBox = document.getElementById("errorBox");
+  const submitBtn = document.getElementById("submitBtn");
 
-form.addEventListener("submit", function (e) {
-e.preventDefault();
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
 
-/* validation */
-let ok = true;
-form.querySelectorAll("[required]").forEach(inp => {
-if (!inp.value.trim()) ok = false;
-});
+    errorBox.classList.remove("show");
+    errorBox.textContent = "";
 
-if (!ok) {
-alert("Please fill required fields");
-return;
-}
+    const name = document.getElementById("inp-name").value.trim();
+    const phone = document.getElementById("inp-phone").value.trim();
+    const email = document.getElementById("inp-email").value.trim();
+    const product = document.getElementById("inp-prod").value.trim() || "General enquiry";
+    const message = document.getElementById("inp-msg").value.trim();
 
-/* values */
-const n = document.getElementById("inp-name").value;
-const ph = document.getElementById("inp-phone").value;
-const em = document.getElementById("inp-email").value;
-const p = document.getElementById("inp-prod").value || "General";
-const m = document.getElementById("inp-msg").value;
+    if (!name || !phone || !message) {
+      errorBox.textContent = "Please fill in your name, phone number, and message.";
+      errorBox.classList.add("show");
+      return;
+    }
 
-/* SEND EMAIL */
-emailjs.send(
-"service_d3dtouz",
-"template_06lp3bm",
-{
-customer_name: n,
-customer_phone: ph,
-customer_email: em,
-product: p,
-message: m,
-to_email: "meeranzia@gmail.com"
-}
-)
-.then(() => {
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending...";
 
-document.getElementById("formWrap").style.display = "none";
-document.getElementById("successBox").classList.add("show");
+    try {
+      const response = await fetch("/api/quote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name,
+          phone,
+          email,
+          product,
+          message
+        })
+      });
 
-/* WhatsApp message */
-const msg =
-`Hi Metal Minds! My name is ${n}. Quote for: ${p}. Notes: ${m}`;
+      const result = await response.json();
 
-setTimeout(() => {
-window.open(
-"https://wa.me/263000000000?text=" + encodeURIComponent(msg),
-"_blank"
-);
-}, 800);
+      if (!response.ok) {
+        errorBox.textContent = result.message || "Unable to send your quote request. Please try again.";
+        errorBox.classList.add("show");
+        return;
+      }
 
-})
-.catch(err => {
-console.log(err);
-alert("Email failed to send.");
-});
+      formWrap.style.display = "none";
+      successBox.classList.add("show");
 
-});
+    } catch (error) {
+      console.error("Quote submission failed:", error);
+      errorBox.textContent = "Network error. Please try again.";
+      errorBox.classList.add("show");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Send Quote";
+    }
+  });
 
-/* =========================
-   MAP
-========================= */
-if (typeof L !== "undefined") {
-const map = L.map("map").setView([-17.8311, 31.0451], 14);
+  if (typeof L !== "undefined" && document.getElementById("map")) {
+    const map = L.map("map").setView([-17.8311, 31.0451], 14);
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-attribution: "&copy; OpenStreetMap"
-}).addTo(map);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
 
-L.marker([-17.8311, 31.0451])
-.addTo(map)
-.bindPopup("Metal Minds")
-.openPopup();
-}
-
+    L.marker([-17.8311, 31.0451])
+      .addTo(map)
+      .bindPopup("Metal Minds")
+      .openPopup();
+  }
 });
 </script>
-
+<script src="./chatbot.js"></script>
 </body>
 </html>

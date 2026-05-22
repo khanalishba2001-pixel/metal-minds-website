@@ -1,0 +1,18 @@
+{
+  "name": "metal-minds-website",
+  "version": "1.0.0",
+  "description": "Metal Minds website with Node.js and Express backend",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.1.0",
+    "nodemailer": "^7.0.3",
+    "openai": "^6.38.0"
+  }
+}
