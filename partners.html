@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Partners - Metal Minds</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="./chatbot.css">
+
+<style>
+:root{
+  --ink:#1c1e20;
+  --steel:#2e3338;
+  --silver:#8a9099;
+  --light:#b8bec5;
+  --white:#fff;
+  --off:#f6f7f8;
+  --border:#dde0e4;
+  --accent:#5a6270;
+  --shine:linear-gradient(135deg,#c4c8cc 0%,#e8eaec 40%,#9aa0a8 70%,#c4c8cc 100%);
+  --fh:'Bebas Neue','Barlow Condensed',sans-serif;
+  --fb:'Inter',system-ui,sans-serif;
+  --fm:'IBM Plex Mono',monospace;
+  --max:1200px;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--white);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img{display:block;width:100%;object-fit:cover}
+ul{list-style:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 2.5rem}
+
+/* NAVBAR */
+.site-header{position:sticky;top:0;z-index:200;background:var(--ink);border-bottom:1px solid rgba(255,255,255,.08)}
+.header-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:82px;
+}.nav-logo{display:flex;align-items:center;gap:.75rem}
+
+.nav-logo-box{
+  width:64px;
+  height:64px;
+  background:transparent
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  padding:4px;
+  overflow:hidden;
+}
+
+.nav-logo-box img{
+  width:100% !important;
+  height:100% !important;
+  object-fit:contain !important;
+  display:block !important;
+  background:transparent !important;
+  
+}
+
+
+.nav-logo-name{font-family:var(--fh);font-size:1.45rem;letter-spacing:.08em;color:var(--white)}
+.nav-logo-sub{font-family:var(--fm);font-size:.52rem;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.32);margin-top:1px}
+.nav-links{display:flex;align-items:center;gap:2.2rem}
+.nav-links a{font-family:var(--fm);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.55);transition:color .2s;position:relative;padding-bottom:3px}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--light);transition:width .3s}
+.nav-links a:hover,.nav-links a.active{color:var(--white)}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%}
+.nav-cta{background:rgba(255,255,255,.1)!important;color:var(--white)!important;padding:.45rem 1.1rem;border:1px solid rgba(255,255,255,.2)!important;transition:background .2s!important}
+.nav-cta::after{display:none!important}
+.nav-cta:hover{background:rgba(255,255,255,.18)!important}
+
+.ham{display:none;flex-direction:column;gap:5px;padding:4px}
+.ham span{display:block;width:22px;height:1.5px;background:rgba(255,255,255,.75);transition:.25s}
+.ham.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.ham.open span:nth-child(2){opacity:0}
+.ham.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+
+.mob-nav{display:none;flex-direction:column;background:var(--ink);border-top:1px solid rgba(255,255,255,.07)}
+.mob-nav.open{display:flex}
+.mob-nav a{font-family:var(--fm);font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6);padding:1rem 2.5rem;border-bottom:1px solid rgba(255,255,255,.06);transition:color .2s}
+.mob-nav a:hover,.mob-nav a.active{color:var(--white)}
+
+/* HERO */
+.partners-hero{
+  background:var(--ink);
+  color:var(--white);
+  padding:5.5rem 0 4.5rem;
+  position:relative;
+  overflow:hidden;
+}
+
+.partners-hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(-55deg,transparent,transparent 40px,rgba(255,255,255,.018) 40px,rgba(255,255,255,.018) 41px);
+}
+
+.partners-hero .wrap{position:relative;z-index:1}
+
+.hero-label{
+  font-family:var(--fm);
+  font-size:.62rem;
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.38);
+  margin-bottom:1rem;
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+}
+
+.hero-label::before{
+  content:"";
+  width:28px;
+  height:1px;
+  background:rgba(255,255,255,.35);
+}
+
+.hero-title{
+  font-family:var(--fh);
+  font-size:clamp(3.6rem,7vw,6.5rem);
+  line-height:.9;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+  max-width:900px;
+  margin-bottom:1.2rem;
+}
+
+.hero-title span{
+  background:var(--shine);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.hero-sub{
+  max-width:740px;
+  color:rgba(255,255,255,.52);
+  font-size:1rem;
+  line-height:1.8;
+}
+
+/* PARTNER CARDS */
+.partner-cards{background:var(--off);padding:3.5rem 0}
+.partner-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border)}
+.partner-card{background:var(--white);padding:2rem;min-height:215px;border-top:3px solid var(--steel);transition:.25s}
+.partner-card:hover{transform:translateY(-5px);box-shadow:0 20px 45px rgba(0,0,0,.08)}
+
+.partner-logo-box{
+  width:112px;
+  height:78px;
+  background:#fff;
+  border:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:.65rem;
+  margin-bottom:1.2rem;
+}
+
+.partner-logo-box img{width:100%;height:100%;object-fit:contain}
+.partner-card h3{font-family:var(--fh);font-size:1.8rem;letter-spacing:.04em;text-transform:uppercase;margin-bottom:.4rem}
+.partner-card p{font-size:.9rem;color:var(--accent);line-height:1.7}
+
+/* MAP SECTION */
+.map-section{padding:4.5rem 0;background:var(--white)}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;margin-bottom:2.5rem;flex-wrap:wrap}
+
+.sec-label{
+  font-family:var(--fm);
+  font-size:.62rem;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--silver);
+  margin-bottom:.7rem;
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+}
+
+.sec-label::before{content:"";width:16px;height:1px;background:var(--silver)}
+.sec-heading{font-family:var(--fh);font-size:clamp(2.2rem,4.5vw,3.8rem);line-height:.95;text-transform:uppercase;letter-spacing:.03em}
+.sec-body{max-width:540px;font-size:.95rem;color:var(--accent);line-height:1.75}
+
+.map-only-box{
+  width:100%;
+  height:740px;
+  background:var(--steel);
+  border:1px solid var(--border);
+  overflow:hidden;
+}
+
+#partnersMap{width:100%;height:100%;min-height:740px}
+.leaflet-popup-content-wrapper{border-radius:0}
+.popup-title{font-family:var(--fh);font-size:1.4rem;text-transform:uppercase;line-height:1;margin-bottom:.35rem}
+.popup-address{font-size:.82rem;color:#555;margin-bottom:.65rem}
+.popup-link{display:inline-block;background:var(--ink);color:#fff!important;padding:.45rem .75rem;font-family:var(--fm);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase}
+
+/* FOOTER - SAME AS OTHER PAGES */
+.footer{
+  background:#0e1012;
+  color:var(--white);
+  padding:4rem 0 0;
+}
+
+.footer-logo-img{
+  width:48px;
+  height:48px;
+  object-fit:contain;
+  margin-bottom:.5rem;
+}
+
+.footer-grid{
+  display:grid;
+  grid-template-columns:1.8fr 1fr 1fr 1fr;
+  gap:3rem;
+  padding-bottom:3rem;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.footer-name{
+  font-family:var(--fh);
+  font-size:1.3rem;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  margin-bottom:.3rem;
+}
+
+.footer-name span{
+  background:var(--shine);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.footer-tag{
+  font-size:.8rem;
+  color:rgba(255,255,255,.35);
+  line-height:1.65;
+  margin-bottom:1rem;
+}
+
+.footer-col-h{
+  font-family:var(--fm);
+  font-size:.56rem;
+  letter-spacing:.24em;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.28);
+  margin-bottom:.9rem;
+}
+
+.footer-links{
+  display:flex;
+  flex-direction:column;
+  gap:.4rem;
+}
+
+.footer-links a{
+  font-size:.82rem;
+  color:rgba(255,255,255,.48);
+  transition:color .2s;
+}
+
+.footer-links a:hover{
+  color:var(--white);
+}
+
+.footer-links p{
+  font-size:.82rem;
+  color:rgba(255,255,255,.48);
+}
+
+.footer-bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:1.3rem 0;
+  flex-wrap:wrap;
+  gap:1rem;
+}
+
+.footer-copy{
+  font-family:var(--fm);
+  font-size:.58rem;
+  letter-spacing:.12em;
+  color:rgba(255,255,255,.2);
+}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  .partner-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+  .map-only-box{height:620px}
+  #partnersMap{min-height:620px}
+}
+
+@media(max-width:640px){
+  .nav-links{display:none}
+  .ham{display:flex}
+  .wrap{padding:0 1.3rem}
+  .footer-grid{grid-template-columns:1fr}
+  .partners-hero{padding:4rem 0 3rem}
+  .hero-title{font-size:3.2rem}
+  .map-only-box{height:520px}
+  #partnersMap{min-height:520px}
+}
+</style>
+</head>
+
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a href="index.html" class="nav-logo">
+      <span class="nav-logo-box">
+        <img src="metal-minds-logo.png" alt="Metal Minds">
+      </span>
+      <div>
+        <div class="nav-logo-name">Metal Minds</div>
+        <div class="nav-logo-sub">Construction &amp; Steel &middot; Harare</div>
+      </div>
+    </a>
+
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="products.html">Products</a>
+      <a href="about.html">About</a>
+      <a href="partners.html" class="active">Partners</a>
+      <a href="contact.html">Contact</a>
+      <a href="contact.html" class="nav-cta">Get Quote</a>
+    </nav>
+
+    <button class="ham" id="ham" type="button" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</header>
+
+<nav class="mob-nav" id="mobNav">
+  <a href="index.html">Home</a>
+  <a href="products.html">Products</a>
+  <a href="about.html">About</a>
+  <a href="partners.html" class="active">Partners</a>
+  <a href="contact.html">Contact</a>
+  <a href="contact.html">Get Quote</a>
+</nav>
+
+<section class="partners-hero">
+  <div class="wrap">
+    <div class="hero-label">Our Network</div>
+    <h1 class="hero-title">
+      Metal Minds in Collaboration with <span>N Richards</span> and <span>Megasave</span>
+    </h1>
+    <p class="hero-sub">
+      Through trusted retail and distribution partnerships, Metal Minds products can reach customers across Zimbabwe with stronger branch coverage, reliable access, and convenient local support.
+    </p>
+  </div>
+</section>
+
+      <div class="partner-card">
+        <div class="partner-logo-box">
+          <img src="./images/nrichard-logo.png" alt="N Richards Logo">
+        </div>
+        <h3>N Richards Group</h3>
+        <p>Branch network across Zimbabwe helping customers access quality hardware and building materials locally.</p>
+      </div>
+
+      <div class="partner-card">
+        <div class="partner-logo-box">
+          <img src="./images/megasave-logo.jpg" alt="Megasave Logo">
+        </div>
+        <h3>Megasave</h3>
+        <p>Retail partner supporting wider product availability through a recognised cash and carry network.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="map-section">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <div class="sec-label">Branch Map</div>
+        <h2 class="sec-heading">Partner Locations Across Zimbabwe</h2>
+      </div>
+      <p class="sec-body">
+        Explore Metal Minds, N Richards, and Megasave locations on the map. Click any logo marker to open the branch details and get directions through Google Maps.
+      </p>
+    </div>
+
+    <div class="map-only-box">
+      <div id="partnersMap"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div>
+        <img src="metal-minds-logo.png" alt="Metal Minds Logo" class="footer-logo-img">
+        <div class="footer-name"><span>Metal Minds</span></div>
+        <p class="footer-tag">
+          Supplying quality steel and construction materials across Zimbabwe.
+        </p>
+      </div>
+
+      <div>
+        <div class="footer-col-h">Pages</div>
+        <div class="footer-links">
+          <a href="index.html">Home</a>
+          <a href="products.html">Products</a>
+          <a href="about.html">About</a>
+          <a href="partners.html">Partners</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+
+      <div>
+        <div class="footer-col-h">Products</div>
+        <div class="footer-links">
+          <a href="products.html">IBR Sheets</a>
+          <a href="products.html">Wire Nails</a>
+          <a href="products.html">PVC Pipes</a>
+          <a href="products.html">Welding Rods</a>
+        </div>
+      </div>
+
+      <div>
+        <div class="footer-col-h">Contact</div>
+        <div class="footer-links">
+          <p>106 Coventry Rd, Harare, Zimbabwe</p>
+          <p>Mon–Fri 07:30–17:00</p>
+          <p>Sat 08:00–13:00</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-copy">
+        © 2026 Metal Minds. All rights reserved.
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+const branches = [
+  {
+    partner: "Metal Minds",
+    name: "Metal Minds Head Office",
+    address: "106 Coventry Rd, Harare, Zimbabwe",
+    lat: -17.8292,
+    lng: 31.0522,
+    logo: "metal-mind-logo.png"
+  },
+    {
+    partner: "Megasave",
+    name: "Megasave Chinhoyi",
+    address: "Megasave Chinhoyi, Chinhoyi, Zimbabwe",
+    lat: -17.3667,
+    lng: 30.2000,
+    logo: "./images/megasave-logo.jpg"
+  },
+  {
+    partner: "Megasave",
+    name: "Megasave Glendale",
+    address: "Megasave Glendale, Glendale, Zimbabwe",
+    lat: -17.3550,
+    lng: 31.0670,
+    logo: "./images/megasave-logo.jpg"
+  },
+  {
+    partner: "Megasave",
+    name: "Megasave Karoi",
+    address: "Megasave Karoi, Karoi, Zimbabwe",
+    lat: -16.8167,
+    lng: 29.6833,
+    logo: "./images/megasave-logo.jpg"
+  },
+  {
+    partner: "Megasave",
+    name: "Megasave Marondera",
+    address: "Megasave Marondera, Marondera, Zimbabwe",
+    lat: -18.1853,
+    lng: 31.5519,
+    logo: "./images/megasave-logo.jpg"
+  },
+  {
+    partner: "Megasave",
+    name: "Megasave Mt Darwin",
+    address: "Megasave Mt Darwin, Mount Darwin, Zimbabwe",
+    lat: -16.7833,
+    lng: 31.5833,
+    logo: "./images/megasave-logo.jpg"
+  },
+  {
+    partner: "Megasave",
+    name: "Megasave Mvurwi",
+    address: "Megasave Mvurwi, Mvurwi, Zimbabwe",
+    lat: -17.0333,
+    lng: 30.8500,
+    logo: "./images/megasave-logo.jpg"
+  },
+  {
+    partner: "Megasave",
+    name: "Megasave Shamva",
+    address: "Megasave Shamva, Shamva, Zimbabwe",
+    lat: -17.3167,
+    lng: 31.5667,
+    logo: "./images/megasave-logo.jpg"
+  },
+  {
+    partner: "Megasave",
+    name: "Megasave Workington",
+    address: "16 Burnley Road, Workington, Harare, Zimbabwe",
+    lat: -17.8448,
+    lng: 31.0335,
+    logo: "./images/megasave-logo.jpg"
+  },
+  {
+    partner: "N Richards",
+    name: "Beitbridge",
+    address: "Shop 10, Zesa Complex, Beitbridge, Zimbabwe",
+    lat: -22.2167,
+    lng: 30.0000,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Bindura",
+    address: "83A Second Street, Bindura, Zimbabwe",
+    lat: -17.3019,
+    lng: 31.3306,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Bulawayo",
+    address: "59 Waverley Rd, Thorngrove, Bulawayo, Zimbabwe",
+    lat: -20.1325,
+    lng: 28.6265,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Checheche",
+    address: "216A Checheche Growth Point, Chisumbanje, Zimbabwe",
+    lat: -20.9333,
+    lng: 32.2500,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Chinhoyi",
+    address: "41 Masonic Lane, Chinhoyi, Zimbabwe",
+    lat: -17.3667,
+    lng: 30.2000,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Chipinge Hardware",
+    address: "Stand 48A, Ferreira St, Chipinge, Zimbabwe",
+    lat: -20.1883,
+    lng: 32.6236,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Chipinge Wholesale",
+    address: "249 Ferreira St, Chipinge, Zimbabwe",
+    lat: -20.1883,
+    lng: 32.6236,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Chiredzi Cash & Carry",
+    address: "70 Knobthorn Rd, Chiredzi, Zimbabwe",
+    lat: -21.0500,
+    lng: 31.6667,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Chiredzi Hardware",
+    address: "70 Knobthorn Rd, Chiredzi, Zimbabwe",
+    lat: -21.0500,
+    lng: 31.6667,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Chiredzi Wholesale",
+    address: "73 Knobthorn Road, Chiredzi, Zimbabwe",
+    lat: -21.0500,
+    lng: 31.6667,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Chivhu",
+    address: "244 Cloete Street, Chivhu, Zimbabwe",
+    lat: -19.0167,
+    lng: 30.9000,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Chivi",
+    address: "125 Murambi Building, Chivi Growth Point, Zimbabwe",
+    lat: -20.5000,
+    lng: 30.5833,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Gokwe",
+    address: "12 Mateta Rd, Gokwe, Zimbabwe",
+    lat: -18.2167,
+    lng: 28.9333,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Graniteside",
+    address: "16995 Sande Cres/Boshoff Dr, Graniteside, Harare, Zimbabwe",
+    lat: -17.8750,
+    lng: 31.0500,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Gweru",
+    address: "2 Leopold Takawira St, Gweru, Zimbabwe",
+    lat: -19.4500,
+    lng: 29.8167,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Jerera",
+    address: "Stand 484, Jerera, Zimbabwe",
+    lat: -19.9167,
+    lng: 31.9500,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Kadoma",
+    address: "24 Herbert Chitepo Street, Kadoma, Zimbabwe",
+    lat: -18.3333,
+    lng: 29.9167,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Karoi",
+    address: "120 James Street, Karoi, Zimbabwe",
+    lat: -16.8167,
+    lng: 29.6833,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Kwekwe",
+    address: "977 Cobar Street, Industrial Area, Kwekwe, Zimbabwe",
+    lat: -18.9167,
+    lng: 29.8167,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Marondera",
+    address: "Cnr Sheffield/Nyaguwa Rd, Marondera, Zimbabwe",
+    lat: -18.1853,
+    lng: 31.5519,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Masvingo Bradburn",
+    address: "Cnr Bradburn/Josiah Tongogara Rd, Masvingo, Zimbabwe",
+    lat: -20.0637,
+    lng: 30.8277,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Masvingo Cash & Carry",
+    address: "405 Robert Mugabe Way, Masvingo, Zimbabwe",
+    lat: -20.0637,
+    lng: 30.8277,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Masvingo Hardware",
+    address: "408 Robert Mugabe Way, Masvingo, Zimbabwe",
+    lat: -20.0637,
+    lng: 30.8277,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Masvingo Hurudza",
+    address: "491 Rekayi Tangwena Rd, Masvingo, Zimbabwe",
+    lat: -20.0637,
+    lng: 30.8277,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Masvingo Wholesale",
+    address: "440 Herbert Chitepo St, Masvingo, Zimbabwe",
+    lat: -20.0637,
+    lng: 30.8277,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Mpandawana",
+    address: "364 Madondo Building, Gutu Mpandawana, Zimbabwe",
+    lat: -19.6833,
+    lng: 31.1667,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Nyika",
+    address: "Stand 760, Nyika Growth Point, Bikita RDC, Zimbabwe",
+    lat: -20.2500,
+    lng: 31.5833,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Rusape",
+    address: "73 Maungwe Rd/Stockton St, Industrial Area, Rusape, Zimbabwe",
+    lat: -18.5278,
+    lng: 32.1284,
+    logo: "./images/nrichard-logo.png"
+  },
+  {
+    partner: "N Richards",
+    name: "Zvishavane",
+    address: "744 Gweru Rd, Zvishavane, Zimbabwe",
+    lat: -20.3267,
+    lng: 30.0665,
+    logo: "./images/nrichard-logo.png"
+  }
+];
+
+const map = L.map("partnersMap", {
+  scrollWheelZoom: true
+}).setView([-19.0154, 29.1549], 6);
+
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  attribution: "&copy; OpenStreetMap contributors"
+}).addTo(map);
+
+function googleMapsUrl(address){
+  return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(address);
+}
+
+function createLogoIcon(logo){
+  return L.divIcon({
+    className: "custom-logo-marker",
+    html: `
+      <div style="
+        width:46px;
+        height:46px;
+        background:white;
+        border-radius:50%;
+        border:2px solid #2e3338;
+        box-shadow:0 8px 24px rgba(0,0,0,.28);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:6px;
+        overflow:hidden;
+      ">
+        <img src="${logo}" style="width:100%;height:100%;object-fit:contain;">
+      </div>
+    `,
+    iconSize: [46,46],
+    iconAnchor: [23,23],
+    popupAnchor: [0,-22]
+  });
+}
+
+const markerBounds = [];
+
+branches.forEach((branch) => {
+  const marker = L.marker([branch.lat, branch.lng], {
+    icon: createLogoIcon(branch.logo)
+  }).addTo(map);
+
+  marker.bindPopup(`
+    <div class="popup-title">${branch.name}</div>
+    <div class="popup-address">${branch.partner}<br>${branch.address}</div>
+    <a class="popup-link" href="${googleMapsUrl(branch.address)}" target="_blank">Open Google Maps</a>
+  `);
+
+  markerBounds.push([branch.lat, branch.lng]);
+});
+
+if(markerBounds.length > 0){
+  map.fitBounds(markerBounds, {
+    padding: [45, 45]
+  });
+}
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const ham = document.getElementById("ham");
+  const mobNav = document.getElementById("mobNav");
+
+  if (ham && mobNav) {
+    ham.addEventListener("click", function () {
+      ham.classList.toggle("open");
+      mobNav.classList.toggle("open");
+    });
+  }
+});
+</script>
+
+<script src="./chatbot.js"></script>
+</body>
+</html>
